@@ -103,4 +103,6 @@ class Login extends BaseController
         // Redirige al inicio (login)
         return redirect()->to('/');
     }
+
+    
 }

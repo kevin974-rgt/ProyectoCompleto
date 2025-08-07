@@ -7,31 +7,58 @@ use CodeIgniter\Router\RouteCollection;
  * Se define que la variable $routes es una instancia de RouteCollection.
  */
 
-// Página de inicio: redirige a Login::index
+// Página de inicio
 $routes->get('/', 'Login::index');
-
-// Ruta para enviar los datos del formulario de login (POST)
 $routes->post('login/autenticar', 'Login::autenticar');
-
-// Ruta para mostrar el formulario de registro
 $routes->get('login/registro', 'Login::registro');
-
-// Ruta para guardar los datos del usuario registrado (POST)
 $routes->post('login/guardar', 'Login::guardarUsuario');
-
-// Ruta para mostrar el dashboard luego del login
 $routes->get('dashboard', 'Login::dashboard');
-
-// Ruta para cerrar sesión
 $routes->get('login/logout', 'Login::logout');
 
-// Ruta para mostrar todos los usuarios registrados
-$routes->get('usuarios', 'Usuarios::index');
+// Usuarios
+$routes->group('usuarios', function($routes){
+    $routes->get('', 'Usuarios::index');
+    $routes->post('registrar', 'Usuarios::registrar');
+    $routes->post('eliminar/(:num)', 'Usuarios::eliminar/$1');
+});
 
-// Ruta para registrar un nuevo usuario (POST)
-$routes->post('usuarios/registrar', 'Usuarios::registrar');
+// Productos
+$routes->group('productos', function($routes){
+    $routes->get('', 'Productos::index');
+    $routes->get('crear', 'Productos::crear');
+    $routes->post('guardar', 'Productos::guardar');
+    $routes->get('editar/(:num)', 'Productos::editar/$1');
+    $routes->post('actualizar/(:num)', 'Productos::actualizar/$1');
+});
 
-// Ruta para eliminar un usuario según su ID (POST con parámetro numérico)
-$routes->post('usuarios/eliminar/(:num)', 'Usuarios::eliminar/$1');
+// Compras
+$routes->group('compras', function($routes){
+    $routes->get('registrar', 'Compras::registrar');
+    $routes->post('guardar', 'Compras::guardar');
+    $routes->get('listar', 'Compras::listar');
+});
+
+// Ventas
+$routes->group('ventas', function($routes){
+    $routes->get('crear', 'Ventas::crear');
+    $routes->post('guardar', 'Ventas::guardar');
+});
+
+// ✅ API fuera del grupo ventas
+$routes->group('api', function($routes) {
+    $routes->get('productos', 'Api\ProductoApi::index');
+    $routes->post('productos', 'Api\ProductoApi::create');
+    $routes->put('productos/(:num)', 'Api\ProductoApi::update/$1');
+    $routes->delete('productos/(:num)', 'Api\ProductoApi::delete/$1');
+});
+
+
+
+
+
+
+
+
+
 
 
