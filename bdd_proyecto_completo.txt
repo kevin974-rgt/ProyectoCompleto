@@ -1,0 +1,318 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 08-08-2025 a las 22:38:09
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `bdd_proyecto_completo`
+--
+
+DELIMITER $$
+--
+-- Procedimientos
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_ACTUALIZAR_PRODUCTO` (IN `id` INT, IN `nom` VARCHAR(100), IN `precio` DECIMAL(10,2), IN `stock` INT)   BEGIN
+    UPDATE productos SET nombre = nom, precio = precio, stock = stock WHERE id_producto = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_DELETE_PRODUCTO` (IN `p_id` INT)   BEGIN
+    DELETE FROM productos WHERE id_producto = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_DELETE_USUARIOS` (IN `p_id` INT)   BEGIN
+    DELETE FROM tbl_usuarios WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_ELIMINAR_PRODUCTO` (IN `id` INT)   BEGIN
+    DELETE FROM productos WHERE id_producto = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_INSERT_COMPRA` (IN `p_id_producto` INT, IN `p_cantidad` INT)   BEGIN
+    INSERT INTO compras (id_producto, cantidad)
+    VALUES (p_id_producto, p_cantidad);
+    
+    UPDATE productos
+    SET stock = stock + p_cantidad
+    WHERE id_producto = p_id_producto;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_INSERT_PRODUCTO` (IN `p_nombre` VARCHAR(100), IN `p_precio` DECIMAL(10,2), IN `p_stock` INT)   BEGIN
+    INSERT INTO productos (nombre, precio, stock) 
+    VALUES (p_nombre, p_precio, p_stock);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_INSERT_USUARIOS` (IN `p_nombre` VARCHAR(100), IN `p_email` VARCHAR(100), IN `p_password` VARCHAR(255))   BEGIN
+    INSERT INTO tbl_usuarios (nombre, email, password)
+    VALUES (p_nombre, p_email, p_password);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_INSERT_VENTA` (IN `p_id_cliente` INT, IN `p_total` DECIMAL(10,2))   BEGIN
+    INSERT INTO ventas (id_cliente, total)
+    VALUES (p_id_cliente, p_total);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_LISTAR_VENTAS` ()   BEGIN
+    SELECT * FROM ventas;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_OBTENER_PRODUCTOS` ()   BEGIN
+    SELECT * FROM productos;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_SELECT_PRODUCTOS` ()   BEGIN
+    SELECT * FROM productos;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_UPDATE_STOCK` (IN `p_id_producto` INT, IN `p_cantidad` INT)   BEGIN
+    UPDATE productos
+    SET stock = stock - p_cantidad
+    WHERE id_producto = p_id_producto;
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `clientes`
+--
+
+CREATE TABLE `clientes` (
+  `id_cliente` int(11) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `cedula` varchar(10) DEFAULT NULL,
+  `direccion` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `compras`
+--
+
+CREATE TABLE `compras` (
+  `id_compra` int(11) NOT NULL,
+  `id_producto` int(11) DEFAULT NULL,
+  `cantidad` int(11) NOT NULL,
+  `fecha` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `compras`
+--
+
+INSERT INTO `compras` (`id_compra`, `id_producto`, `cantidad`, `fecha`) VALUES
+(1, 3, 2, '2025-08-05 13:51:34'),
+(2, 2, 3, '2025-08-05 14:41:52'),
+(3, 1, 2, '2025-08-05 14:43:22'),
+(4, 1, 2, '2025-08-05 14:49:23'),
+(5, 1, 2, '2025-08-05 14:56:30'),
+(6, 4, 5, '2025-08-07 15:58:27');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_ventas`
+--
+
+CREATE TABLE `detalle_ventas` (
+  `id_detalle` int(11) NOT NULL,
+  `id_venta` int(11) DEFAULT NULL,
+  `id_producto` int(11) DEFAULT NULL,
+  `cantidad` int(11) DEFAULT NULL,
+  `subtotal` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `productos`
+--
+
+CREATE TABLE `productos` (
+  `id_producto` int(11) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL,
+  `precio` decimal(10,2) DEFAULT NULL,
+  `stock` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `productos`
+--
+
+INSERT INTO `productos` (`id_producto`, `nombre`, `descripcion`, `precio`, `stock`) VALUES
+(1, 'Teclado Gamer PRO', '', 69.99, 30),
+(2, 'Smartphone Samsung Galaxy S23', '', 1200.00, 20),
+(3, 'Auriculares Bose QuietComfort', NULL, 299.99, 17),
+(4, 'Monitor LG UltraWide 34\"', NULL, 450.50, 13),
+(5, 'Teclado Mecánico Logitech', NULL, 129.90, 20),
+(6, 'Swich', NULL, 4.00, 3),
+(7, 'Cerveza', NULL, 3.75, 6),
+(8, 'Producto Test', NULL, 20.99, 15),
+(9, 'Teclado Gamer', NULL, 59.99, 20);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tbl_usuarios`
+--
+
+CREATE TABLE `tbl_usuarios` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tbl_usuarios`
+--
+
+INSERT INTO `tbl_usuarios` (`id`, `nombre`, `email`, `password`) VALUES
+(1, 'Admin', 'admin@demo.com', '$2y$10$z1rPY3pEwZ9RVqlVmzEJkeW3VJZtPYO5OnmYoZhSptntQukAq3KoC'),
+(3, 'Luis', 'luis@gmail.com', '$2y$10$hOlkZCkKLKDGUgpvnHED9.LpUQpH8njdMV4lA3VtZ8WHJFur6ww4m'),
+(4, 'Kevin', 'kevin@gmail.com', '$2y$10$BHOOLO5XqD/DfUtLikqASufVQMBtgK9yhPpm/Xd7rnkCbPSRlbjL6'),
+(5, 'Alisson', 'alison@gmail.com', '$2y$10$dTCclamvYzdU.BoFyNLRwu94rYYlbBfoERahUbxIGjpE6lbWLRzGW'),
+(6, 'Maria', 'maria@gmail.com', '$2y$10$M17YQIJVqc3KCXoWFtxFWedxGZEbUxmCjnkGvryuMDqpl1xBl9wui'),
+(7, 'Mercelo', 'marcelo@gmail.com', '$2y$10$9V3piFgwgIsiHd.v2Ok2o.UH9Hn/OZvfXQXhICf9ea87bttIvM0rK');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ventas`
+--
+
+CREATE TABLE `ventas` (
+  `id_venta` int(11) NOT NULL,
+  `id_cliente` int(11) DEFAULT NULL,
+  `fecha` datetime DEFAULT current_timestamp(),
+  `total` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id_cliente`);
+
+--
+-- Indices de la tabla `compras`
+--
+ALTER TABLE `compras`
+  ADD PRIMARY KEY (`id_compra`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `detalle_ventas`
+--
+ALTER TABLE `detalle_ventas`
+  ADD PRIMARY KEY (`id_detalle`),
+  ADD KEY `id_venta` (`id_venta`),
+  ADD KEY `id_producto` (`id_producto`);
+
+--
+-- Indices de la tabla `productos`
+--
+ALTER TABLE `productos`
+  ADD PRIMARY KEY (`id_producto`);
+
+--
+-- Indices de la tabla `tbl_usuarios`
+--
+ALTER TABLE `tbl_usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indices de la tabla `ventas`
+--
+ALTER TABLE `ventas`
+  ADD PRIMARY KEY (`id_venta`),
+  ADD KEY `id_cliente` (`id_cliente`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `compras`
+--
+ALTER TABLE `compras`
+  MODIFY `id_compra` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_ventas`
+--
+ALTER TABLE `detalle_ventas`
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `productos`
+--
+ALTER TABLE `productos`
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `tbl_usuarios`
+--
+ALTER TABLE `tbl_usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `ventas`
+--
+ALTER TABLE `ventas`
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `compras`
+--
+ALTER TABLE `compras`
+  ADD CONSTRAINT `compras_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`);
+
+--
+-- Filtros para la tabla `detalle_ventas`
+--
+ALTER TABLE `detalle_ventas`
+  ADD CONSTRAINT `detalle_ventas_ibfk_1` FOREIGN KEY (`id_venta`) REFERENCES `ventas` (`id_venta`),
+  ADD CONSTRAINT `detalle_ventas_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`);
+
+--
+-- Filtros para la tabla `ventas`
+--
+ALTER TABLE `ventas`
+  ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
